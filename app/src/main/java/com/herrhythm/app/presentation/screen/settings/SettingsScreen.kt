@@ -172,6 +172,43 @@ fun SettingsScreen(
             }
         }
 
+        // Demo Data (for testing)
+        Card(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(16.dp)) {
+                Text("Demo Data", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "Load sample data to test the app, or clear everything to start fresh.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(8.dp))
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = { viewModel.loadDemoData() },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("Load Demo Data") }
+                    OutlinedButton(
+                        onClick = { viewModel.clearAllData() },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) { Text("Clear All Data") }
+                }
+
+                uiState.demoDataMessage?.let { message ->
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        message,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+
         // About
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp)) {

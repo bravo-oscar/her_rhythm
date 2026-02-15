@@ -31,4 +31,7 @@ interface CycleDao {
 
     @Query("SELECT * FROM cycles WHERE start_date <= :date AND (end_date IS NULL OR end_date >= :date) LIMIT 1")
     suspend fun getCycleForDate(date: LocalDate): CycleEntity?
+
+    @Query("DELETE FROM cycles")
+    suspend fun deleteAll()
 }
