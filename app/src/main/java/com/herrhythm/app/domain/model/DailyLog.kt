@@ -11,6 +11,7 @@ data class DailyLog(
     val symptoms: List<Symptom> = emptyList(),
     val flowIntensity: FlowIntensity = FlowIntensity.NONE,
     val temperature: Float? = null,
+    val lifestyleFactors: List<LifestyleFactor> = emptyList(),
     val createdAt: LocalDate = LocalDate.now(),
     val updatedAt: LocalDate = LocalDate.now()
 )

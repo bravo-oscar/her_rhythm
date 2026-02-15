@@ -5,18 +5,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.herrhythm.app.domain.model.Mood
+import com.herrhythm.app.domain.model.LifestyleFactor
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun MoodChipGroup(
-    selected: Mood,
-    onSelect: (Mood) -> Unit,
+fun LifestyleChipGroup(
+    selected: List<LifestyleFactor>,
+    onToggle: (LifestyleFactor) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         Text(
-            text = "Mood",
+            text = "Lifestyle",
             style = MaterialTheme.typography.labelLarge,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -25,11 +25,11 @@ fun MoodChipGroup(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Mood.entries.forEach { mood ->
+            LifestyleFactor.entries.forEach { factor ->
                 FilterChip(
-                    selected = selected == mood,
-                    onClick = { onSelect(mood) },
-                    label = { Text("${mood.emoji} ${mood.displayName}") }
+                    selected = factor in selected,
+                    onClick = { onToggle(factor) },
+                    label = { Text("${factor.emoji} ${factor.displayName}") }
                 )
             }
         }

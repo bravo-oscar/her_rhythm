@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.herrhythm.app.presentation.common.components.FlowIntensitySelector
+import com.herrhythm.app.presentation.common.components.LifestyleChipGroup
 import com.herrhythm.app.presentation.common.components.MoodChipGroup
 import com.herrhythm.app.presentation.common.components.SymptomChipGroup
 
@@ -47,23 +48,57 @@ fun DailyLogEntryScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            // Section 1: Mood & Emotions
+            Text(
+                text = "Mood & Emotions",
+                style = MaterialTheme.typography.titleMedium
+            )
             MoodChipGroup(
                 selected = uiState.mood,
                 onSelect = viewModel::updateMood
             )
 
+            HorizontalDivider()
+
+            // Section 2: Symptoms
+            Text(
+                text = "Symptoms",
+                style = MaterialTheme.typography.titleMedium
+            )
             SymptomChipGroup(
                 selected = uiState.symptoms,
                 onToggle = viewModel::toggleSymptom
             )
 
+            HorizontalDivider()
+
+            // Section 3: Flow
+            Text(
+                text = "Flow",
+                style = MaterialTheme.typography.titleMedium
+            )
             FlowIntensitySelector(
                 selected = uiState.flowIntensity,
                 onSelect = viewModel::updateFlowIntensity
             )
 
+            HorizontalDivider()
+
+            // Section 4: Lifestyle
+            Text(
+                text = "Lifestyle",
+                style = MaterialTheme.typography.titleMedium
+            )
+            LifestyleChipGroup(
+                selected = uiState.lifestyleFactors,
+                onToggle = viewModel::toggleLifestyleFactor
+            )
+
+            HorizontalDivider()
+
+            // Section 5: Temperature + Notes
             OutlinedTextField(
                 value = uiState.temperature,
                 onValueChange = viewModel::updateTemperature,
@@ -80,6 +115,7 @@ fun DailyLogEntryScreen(
                 minLines = 3
             )
 
+            // Section 6: Save
             Button(
                 onClick = viewModel::save,
                 modifier = Modifier.fillMaxWidth()

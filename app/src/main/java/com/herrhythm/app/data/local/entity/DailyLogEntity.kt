@@ -2,6 +2,7 @@ package com.herrhythm.app.data.local.entity
 
 import androidx.room.*
 import com.herrhythm.app.domain.model.FlowIntensity
+import com.herrhythm.app.domain.model.LifestyleFactor
 import com.herrhythm.app.domain.model.Mood
 import com.herrhythm.app.domain.model.Symptom
 import java.time.LocalDate
@@ -19,6 +20,7 @@ data class DailyLogEntity(
     val symptoms: List<Symptom> = emptyList(),
     @ColumnInfo(name = "flow_intensity") val flowIntensity: FlowIntensity = FlowIntensity.NONE,
     val temperature: Float? = null,
+    @ColumnInfo(name = "lifestyle_factors", defaultValue = "") val lifestyleFactors: List<LifestyleFactor> = emptyList(),
     @ColumnInfo(name = "created_at") val createdAt: LocalDate = LocalDate.now(),
     @ColumnInfo(name = "updated_at") val updatedAt: LocalDate = LocalDate.now()
 )

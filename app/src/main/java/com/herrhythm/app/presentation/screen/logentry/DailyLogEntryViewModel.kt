@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.herrhythm.app.domain.model.DailyLog
 import com.herrhythm.app.domain.model.FlowIntensity
+import com.herrhythm.app.domain.model.LifestyleFactor
 import com.herrhythm.app.domain.model.Mood
 import com.herrhythm.app.domain.model.Symptom
 import com.herrhythm.app.domain.usecase.log.AddDailyLogUseCase
@@ -21,6 +22,7 @@ data class DailyLogEntryUiState(
     val flowIntensity: FlowIntensity = FlowIntensity.NONE,
     val note: String = "",
     val temperature: String = "",
+    val lifestyleFactors: List<LifestyleFactor> = emptyList(),
     val isEditing: Boolean = false,
     val isSaved: Boolean = false
 )
@@ -50,6 +52,7 @@ class DailyLogEntryViewModel @Inject constructor(
                         flowIntensity = log.flowIntensity,
                         note = log.note,
                         temperature = log.temperature?.toString() ?: "",
+                        lifestyleFactors = log.lifestyleFactors,
                         isEditing = true
                     )
                 }
@@ -63,6 +66,13 @@ class DailyLogEntryViewModel @Inject constructor(
         _uiState.update { state ->
             val updated = if (symptom in state.symptoms) state.symptoms - symptom else state.symptoms + symptom
             state.copy(symptoms = updated)
+        }
+    }
+
+    fun toggleLifestyleFactor(factor: LifestyleFactor) {
+        _uiState.update { state ->
+            val updated = if (factor in state.lifestyleFactors) state.lifestyleFactors - factor else state.lifestyleFactors + factor
+            state.copy(lifestyleFactors = updated)
         }
     }
 
@@ -80,7 +90,8 @@ class DailyLogEntryViewModel @Inject constructor(
                 symptoms = state.symptoms,
                 flowIntensity = state.flowIntensity,
                 note = state.note,
-                temperature = temp
+                temperature = temp,
+                lifestyleFactors = state.lifestyleFactors
             )
             addDailyLogUseCase(log)
             _uiState.update { it.copy(isSaved = true) }

@@ -60,6 +60,7 @@ private fun DailyLogEntity.toDomain(): DailyLog {
         symptoms = symptoms,
         flowIntensity = flowIntensity,
         temperature = temperature,
+        lifestyleFactors = lifestyleFactors,
         createdAt = createdAt,
         updatedAt = updatedAt
     )
@@ -75,6 +76,7 @@ private fun DailyLog.toEntity(): DailyLogEntity {
         symptoms = symptoms,
         flowIntensity = flowIntensity,
         temperature = temperature,
+        lifestyleFactors = lifestyleFactors,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

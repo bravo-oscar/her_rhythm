@@ -27,7 +27,8 @@ data class BackupDailyLog(
     val mood: String,
     val symptoms: List<String>,
     val flowIntensity: String,
-    val temperature: Float?
+    val temperature: Float?,
+    val lifestyleFactors: List<String> = emptyList()
 )
 
 @Serializable

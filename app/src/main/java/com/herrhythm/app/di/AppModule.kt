@@ -24,7 +24,7 @@ object AppModule {
             context,
             HerRhythmDatabase::class.java,
             "her_rhythm_database"
-        ).build()
+        ).addMigrations(HerRhythmDatabase.MIGRATION_1_2).build()
     }
 
     @Provides

@@ -40,7 +40,8 @@ class ExportDataUseCase @Inject constructor(
                     mood = log.mood.name,
                     symptoms = log.symptoms.map { it.name },
                     flowIntensity = log.flowIntensity.name,
-                    temperature = log.temperature
+                    temperature = log.temperature,
+                    lifestyleFactors = log.lifestyleFactors.map { it.name }
                 )
             },
             settings = BackupSettings(

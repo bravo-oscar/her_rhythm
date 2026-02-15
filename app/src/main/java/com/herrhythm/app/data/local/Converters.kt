@@ -2,6 +2,7 @@ package com.herrhythm.app.data.local
 
 import androidx.room.TypeConverter
 import com.herrhythm.app.domain.model.FlowIntensity
+import com.herrhythm.app.domain.model.LifestyleFactor
 import com.herrhythm.app.domain.model.Mood
 import com.herrhythm.app.domain.model.Symptom
 import java.time.LocalDate
@@ -54,6 +55,23 @@ class Converters {
     @TypeConverter
     fun toSymptomList(value: String?): List<Symptom>? {
         if (value.isNullOrBlank()) return emptyList()
-        return value.split(",").map { Symptom.valueOf(it.trim()) }
+        return value.split(",").mapNotNull { name ->
+            try { Symptom.valueOf(name.trim()) } catch (e: Exception) { null }
+        }
+    }
+
+    // List<LifestyleFactor> <-> String (comma-separated names)
+
+    @TypeConverter
+    fun fromLifestyleFactorList(factors: List<LifestyleFactor>?): String? {
+        return factors?.joinToString(",") { it.name }
+    }
+
+    @TypeConverter
+    fun toLifestyleFactorList(value: String?): List<LifestyleFactor>? {
+        if (value.isNullOrBlank()) return emptyList()
+        return value.split(",").mapNotNull { name ->
+            try { LifestyleFactor.valueOf(name.trim()) } catch (e: Exception) { null }
+        }
     }
 }

@@ -74,7 +74,7 @@ private fun LogCard(log: DailyLog, onClick: () -> Unit) {
             )
             Spacer(Modifier.height(4.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(log.mood.displayName, style = MaterialTheme.typography.bodyMedium)
+                Text("${log.mood.emoji} ${log.mood.displayName}", style = MaterialTheme.typography.bodyMedium)
                 if (log.flowIntensity.name != "NONE") {
                     Text("Flow: ${log.flowIntensity.displayName}", style = MaterialTheme.typography.bodyMedium)
                 }
@@ -83,6 +83,14 @@ private fun LogCard(log: DailyLog, onClick: () -> Unit) {
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = log.symptoms.joinToString(", ") { it.displayName },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            if (log.lifestyleFactors.isNotEmpty()) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = log.lifestyleFactors.joinToString(", ") { "${it.emoji} ${it.displayName}" },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

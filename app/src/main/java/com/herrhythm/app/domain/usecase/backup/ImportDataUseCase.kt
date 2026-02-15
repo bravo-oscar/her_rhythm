@@ -50,7 +50,10 @@ class ImportDataUseCase @Inject constructor(
                     try { Symptom.valueOf(name) } catch (e: Exception) { null }
                 },
                 flowIntensity = try { FlowIntensity.valueOf(backup.flowIntensity) } catch (e: Exception) { FlowIntensity.NONE },
-                temperature = backup.temperature
+                temperature = backup.temperature,
+                lifestyleFactors = backup.lifestyleFactors.mapNotNull { name ->
+                    try { LifestyleFactor.valueOf(name) } catch (e: Exception) { null }
+                }
             )
             dailyLogRepository.insertLog(log)
         }
