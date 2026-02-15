@@ -9,8 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.herrhythm.app.presentation.theme.Rose
 
 data class BottomNavItem(
     val label: String,
@@ -30,12 +32,19 @@ fun BottomNavBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    NavigationBar {
+    NavigationBar(
+        tonalElevation = 0.dp
+    ) {
         bottomNavItems.forEach { item ->
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.label) },
                 label = { Text(item.label) },
                 selected = currentRoute == item.route,
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Rose,
+                    selectedTextColor = Rose,
+                    indicatorColor = Rose.copy(alpha = 0.12f)
+                ),
                 onClick = {
                     if (currentRoute != item.route) {
                         navController.navigate(item.route) {

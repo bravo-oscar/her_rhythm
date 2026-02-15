@@ -1,9 +1,12 @@
 package com.herrhythm.app.presentation.screen.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -15,6 +18,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,7 +30,9 @@ import com.herrhythm.app.domain.model.CyclePhase
 import com.herrhythm.app.domain.model.CycleStatistics
 import com.herrhythm.app.presentation.common.components.ConfidenceBadge
 import com.herrhythm.app.presentation.common.components.CountdownWidget
+import com.herrhythm.app.presentation.common.components.GradientBackground
 import com.herrhythm.app.presentation.common.components.PhaseIndicator
+import com.herrhythm.app.presentation.common.components.StyledCard
 import com.herrhythm.app.presentation.theme.*
 
 @Composable
@@ -40,6 +47,7 @@ fun DashboardScreen(
     LaunchedEffect(Unit) { viewModel.loadData() }
 
     Scaffold(
+        containerColor = Color.Transparent,
         floatingActionButton = {
             Column(
                 horizontalAlignment = Alignment.End,
@@ -47,141 +55,174 @@ fun DashboardScreen(
             ) {
                 SmallFloatingActionButton(
                     onClick = onNavigateToDailyLog,
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    containerColor = Lavender,
+                    contentColor = Color.White,
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Icon(Icons.Default.EditNote, "Log today")
                 }
-                FloatingActionButton(onClick = onNavigateToCycleEntry) {
+                FloatingActionButton(
+                    onClick = onNavigateToCycleEntry,
+                    containerColor = Rose,
+                    contentColor = Color.White,
+                    shape = RoundedCornerShape(18.dp)
+                ) {
                     Icon(Icons.Default.Add, "New cycle")
                 }
             }
         }
     ) { padding ->
-        if (uiState.isLoading) {
-            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else if (!uiState.hasCycles) {
-            // Empty state - no cycles logged yet
-            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+        GradientBackground {
+            if (uiState.isLoading) {
+                Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (!uiState.hasCycles) {
+                Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                    StyledCard(
+                        modifier = Modifier.padding(32.dp),
+                        accentColor = Rose
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.padding(24.dp)
+                        ) {
+                            Text(
+                                text = "\uD83C\uDF38",
+                                style = MaterialTheme.typography.headlineLarge
+                            )
+                            Spacer(Modifier.height(12.dp))
+                            Text(
+                                text = "Welcome to Her Rhythm",
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(Modifier.height(16.dp))
+                            Text(
+                                text = "Start by logging your first cycle. Tap the + button to record when your period started.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(Modifier.height(24.dp))
+                            Text(
+                                text = "Your predictions will improve with each cycle you log. All data stays on your device.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            } else {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(32.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Welcome to Her Rhythm",
-                        style = MaterialTheme.typography.headlineMedium,
+                        text = "Her Rhythm",
+                        style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    Spacer(Modifier.height(16.dp))
                     Text(
-                        text = "Start by logging your first cycle. Tap the + button to record when your period started.",
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
+                        text = "Your cycle, your way",
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(Modifier.height(24.dp))
-                    Text(
-                        text = "Your predictions will improve with each cycle you log. All data stays on your device.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Her Rhythm",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.height(24.dp))
 
-                uiState.prediction?.let { prediction ->
-                    PhaseIndicator(
-                        phase = prediction.currentPhase,
-                        cycleDay = prediction.currentCycleDay
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-                    ConfidenceBadge(level = prediction.confidenceLevel)
-
-                    Spacer(Modifier.height(24.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        CountdownWidget(
-                            label = "Next Period",
-                            targetDate = prediction.nextPeriodStart,
-                            color = MenstrualColor,
-                            modifier = Modifier.weight(1f)
+                    uiState.prediction?.let { prediction ->
+                        PhaseIndicator(
+                            phase = prediction.currentPhase,
+                            cycleDay = prediction.currentCycleDay
                         )
-                        CountdownWidget(
-                            label = "PMS Window",
-                            targetDate = prediction.pmsWindowStart,
-                            color = PmsColor,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
 
-                    Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(8.dp))
+                        ConfidenceBadge(level = prediction.confidenceLevel)
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        CountdownWidget(
-                            label = "Ovulation",
-                            targetDate = prediction.ovulationDate,
-                            color = OvulationColor,
-                            modifier = Modifier.weight(1f)
-                        )
-                        CountdownWidget(
-                            label = "Fertile Window",
-                            targetDate = prediction.fertileWindowStart,
-                            color = FertileColor,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-
-                    Spacer(Modifier.height(24.dp))
-
-                    OutlinedButton(onClick = onNavigateToPredictions) {
-                        Icon(Icons.Default.Analytics, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text("View Detailed Predictions")
-                    }
-
-                    // Cycle Stats Card
-                    uiState.cycleStatistics?.let { stats ->
                         Spacer(Modifier.height(24.dp))
-                        CycleStatsCard(stats)
-                    }
 
-                    // Phase Insights Card
-                    if (prediction.currentPhase != CyclePhase.UNKNOWN) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            CountdownWidget(
+                                label = "Next Period",
+                                targetDate = prediction.nextPeriodStart,
+                                color = MenstrualColor,
+                                modifier = Modifier.weight(1f)
+                            )
+                            CountdownWidget(
+                                label = "PMS Window",
+                                targetDate = prediction.pmsWindowStart,
+                                color = PmsColor,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        Spacer(Modifier.height(12.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            CountdownWidget(
+                                label = "Ovulation",
+                                targetDate = prediction.ovulationDate,
+                                color = OvulationColor,
+                                modifier = Modifier.weight(1f)
+                            )
+                            CountdownWidget(
+                                label = "Fertile Window",
+                                targetDate = prediction.fertileWindowStart,
+                                color = FertileColor,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
                         Spacer(Modifier.height(24.dp))
-                        PhaseInsightsCard(prediction.currentPhase)
+
+                        Button(
+                            onClick = onNavigateToPredictions,
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Rose.copy(alpha = 0.12f),
+                                contentColor = Rose
+                            ),
+                            border = BorderStroke(1.dp, Rose.copy(alpha = 0.3f))
+                        ) {
+                            Icon(Icons.Default.Analytics, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("View Detailed Predictions")
+                        }
+
+                        // Cycle Stats Card
+                        uiState.cycleStatistics?.let { stats ->
+                            Spacer(Modifier.height(24.dp))
+                            CycleStatsCard(stats)
+                        }
+
+                        // Phase Insights Card
+                        if (prediction.currentPhase != CyclePhase.UNKNOWN) {
+                            Spacer(Modifier.height(24.dp))
+                            PhaseInsightsCard(prediction.currentPhase)
+                        }
                     }
+
+                    // Health Resources Section
+                    Spacer(Modifier.height(24.dp))
+                    HealthResourcesSection()
+
+                    // Bottom spacing for FAB clearance
+                    Spacer(Modifier.height(80.dp))
                 }
-
-                // Health Resources Section
-                Spacer(Modifier.height(24.dp))
-                HealthResourcesSection()
-
-                // Bottom spacing for FAB clearance
-                Spacer(Modifier.height(80.dp))
             }
         }
     }
@@ -189,13 +230,23 @@ fun DashboardScreen(
 
 @Composable
 private fun CycleStatsCard(stats: CycleStatistics) {
-    Card(
+    StyledCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = Lavender.copy(alpha = 0.1f)
-        )
+        containerColor = MaterialTheme.colorScheme.surface,
+        accentColor = Lavender
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(
+            modifier = Modifier
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            Lavender.copy(alpha = 0.08f),
+                            Rose.copy(alpha = 0.06f)
+                        )
+                    )
+                )
+                .padding(16.dp)
+        ) {
             Text(
                 text = "Your Cycle Stats",
                 style = MaterialTheme.typography.titleMedium,
@@ -203,7 +254,6 @@ private fun CycleStatsCard(stats: CycleStatistics) {
             )
             Spacer(Modifier.height(12.dp))
 
-            // Row 1
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -214,7 +264,6 @@ private fun CycleStatsCard(stats: CycleStatistics) {
             }
             Spacer(Modifier.height(12.dp))
 
-            // Row 2
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -231,6 +280,7 @@ private fun CycleStatsCard(stats: CycleStatistics) {
 private fun StatItem(label: String, value: String, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )
@@ -250,6 +300,7 @@ private fun StatItem(label: String, value: String, modifier: Modifier = Modifier
                 text = value,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
         }
@@ -258,29 +309,38 @@ private fun StatItem(label: String, value: String, modifier: Modifier = Modifier
 
 @Composable
 private fun PhaseInsightsCard(phase: CyclePhase) {
-    val tip = when (phase) {
-        CyclePhase.MENSTRUAL -> "Rest and gentle movement can help. Stay hydrated and prioritize comfort."
-        CyclePhase.FOLLICULAR -> "Energy is rising — great time for planning, socializing, and trying new things."
-        CyclePhase.OVULATION -> "Peak energy and confidence. You may feel more social and creative."
-        CyclePhase.LUTEAL -> "Winding down — prioritize sleep, reduce stress, and practice self-care."
+    val phaseColor = when (phase) {
+        CyclePhase.MENSTRUAL -> MenstrualColor
+        CyclePhase.FOLLICULAR -> FollicularColor
+        CyclePhase.OVULATION -> OvulationColor
+        CyclePhase.LUTEAL -> LutealColor
+        CyclePhase.UNKNOWN -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    val emoji = when (phase) {
+        CyclePhase.MENSTRUAL -> "\uD83C\uDF38"
+        CyclePhase.FOLLICULAR -> "\uD83C\uDF31"
+        CyclePhase.OVULATION -> "\u2728"
+        CyclePhase.LUTEAL -> "\uD83C\uDF19"
         CyclePhase.UNKNOWN -> ""
     }
 
-    Card(
+    val tip = when (phase) {
+        CyclePhase.MENSTRUAL -> "Rest and gentle movement can help. Stay hydrated and prioritize comfort."
+        CyclePhase.FOLLICULAR -> "Energy is rising \u2014 great time for planning, socializing, and trying new things."
+        CyclePhase.OVULATION -> "Peak energy and confidence. You may feel more social and creative."
+        CyclePhase.LUTEAL -> "Winding down \u2014 prioritize sleep, reduce stress, and practice self-care."
+        CyclePhase.UNKNOWN -> ""
+    }
+
+    StyledCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = when (phase) {
-                CyclePhase.MENSTRUAL -> MenstrualColor.copy(alpha = 0.1f)
-                CyclePhase.FOLLICULAR -> FollicularColor.copy(alpha = 0.1f)
-                CyclePhase.OVULATION -> OvulationColor.copy(alpha = 0.1f)
-                CyclePhase.LUTEAL -> LutealColor.copy(alpha = 0.1f)
-                CyclePhase.UNKNOWN -> MaterialTheme.colorScheme.surfaceVariant
-            }
-        )
+        accentColor = phaseColor,
+        containerColor = phaseColor.copy(alpha = 0.08f)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Phase Insights",
+                text = "$emoji Phase Insights",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -289,13 +349,7 @@ private fun PhaseInsightsCard(phase: CyclePhase) {
                 text = phase.displayName + " Phase",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = when (phase) {
-                    CyclePhase.MENSTRUAL -> MenstrualColor
-                    CyclePhase.FOLLICULAR -> FollicularColor
-                    CyclePhase.OVULATION -> OvulationColor
-                    CyclePhase.LUTEAL -> LutealColor
-                    CyclePhase.UNKNOWN -> MaterialTheme.colorScheme.onSurfaceVariant
-                }
+                color = phaseColor
             )
             Spacer(Modifier.height(8.dp))
             Text(
@@ -318,36 +372,36 @@ private val healthResourceCategories = listOf(
     ResourceCategory(
         name = "Understanding Your Cycle",
         links = listOf(
-            ResourceLink("ACOG – Menstrual Cycle Overview", "https://www.acog.org/womens-health/faqs/your-changing-body-puberty-in-girls"),
-            ResourceLink("Office on Women's Health – Menstrual Cycle", "https://www.womenshealth.gov/menstrual-cycle")
+            ResourceLink("ACOG \u2013 Menstrual Cycle Overview", "https://www.acog.org/womens-health/faqs/your-changing-body-puberty-in-girls"),
+            ResourceLink("Office on Women's Health \u2013 Menstrual Cycle", "https://www.womenshealth.gov/menstrual-cycle")
         )
     ),
     ResourceCategory(
         name = "Ovulation & Fertility",
         links = listOf(
-            ResourceLink("Mayo Clinic – Getting Pregnant", "https://www.mayoclinic.org/healthy-lifestyle/getting-pregnant/in-depth/how-to-get-pregnant/art-20047611"),
-            ResourceLink("Planned Parenthood – Fertility Awareness", "https://www.plannedparenthood.org/learn/birth-control/fertility-awareness")
+            ResourceLink("Mayo Clinic \u2013 Getting Pregnant", "https://www.mayoclinic.org/healthy-lifestyle/getting-pregnant/in-depth/how-to-get-pregnant/art-20047611"),
+            ResourceLink("Planned Parenthood \u2013 Fertility Awareness", "https://www.plannedparenthood.org/learn/birth-control/fertility-awareness")
         )
     ),
     ResourceCategory(
         name = "PMS & Mood",
         links = listOf(
-            ResourceLink("ACOG – Premenstrual Syndrome", "https://www.acog.org/womens-health/faqs/premenstrual-syndrome"),
-            ResourceLink("Office on Women's Health – PMS", "https://www.womenshealth.gov/menstrual-cycle/premenstrual-syndrome")
+            ResourceLink("ACOG \u2013 Premenstrual Syndrome", "https://www.acog.org/womens-health/faqs/premenstrual-syndrome"),
+            ResourceLink("Office on Women's Health \u2013 PMS", "https://www.womenshealth.gov/menstrual-cycle/premenstrual-syndrome")
         )
     ),
     ResourceCategory(
         name = "Perimenopause & Menopause",
         links = listOf(
-            ResourceLink("Mayo Clinic – Perimenopause", "https://www.mayoclinic.org/diseases-conditions/perimenopause/symptoms-causes/syc-20354666"),
-            ResourceLink("NAMS – Menopause Information", "https://www.menopause.org/for-women")
+            ResourceLink("Mayo Clinic \u2013 Perimenopause", "https://www.mayoclinic.org/diseases-conditions/perimenopause/symptoms-causes/syc-20354666"),
+            ResourceLink("NAMS \u2013 Menopause Information", "https://www.menopause.org/for-women")
         )
     ),
     ResourceCategory(
         name = "When to See a Doctor",
         links = listOf(
-            ResourceLink("ACOG – Warning Signs", "https://www.acog.org/womens-health/faqs/abnormal-uterine-bleeding"),
-            ResourceLink("Mayo Clinic – Menstrual Irregularities", "https://www.mayoclinic.org/symptoms/menstrual-cramps/basics/when-to-see-doctor/sym-20050648")
+            ResourceLink("ACOG \u2013 Warning Signs", "https://www.acog.org/womens-health/faqs/abnormal-uterine-bleeding"),
+            ResourceLink("Mayo Clinic \u2013 Menstrual Irregularities", "https://www.mayoclinic.org/symptoms/menstrual-cramps/basics/when-to-see-doctor/sym-20050648")
         )
     )
 )
@@ -373,11 +427,10 @@ private fun ExpandableResourceCard(category: ResourceCategory) {
     var expanded by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
 
-    Card(
+    StyledCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = Teal.copy(alpha = 0.08f)
-        )
+        accentColor = Teal,
+        containerColor = Teal.copy(alpha = 0.06f)
     ) {
         Column {
             Row(

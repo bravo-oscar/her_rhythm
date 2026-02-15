@@ -2,6 +2,7 @@ package com.herrhythm.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,7 +28,35 @@ class MainActivity : ComponentActivity() {
         setContent {
             val settings by userSettingsRepository.getSettings()
                 .collectAsStateWithLifecycle(initialValue = null)
-            HerRhythmTheme(themeMode = settings?.themeMode ?: "system") {
+            val themeMode = settings?.themeMode ?: "system"
+            val isDark = when (themeMode) {
+                "light" -> false
+                "dark" -> true
+                else -> resources.configuration.uiMode and
+                        android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
+                        android.content.res.Configuration.UI_MODE_NIGHT_YES
+            }
+
+            enableEdgeToEdge(
+                statusBarStyle = if (isDark) {
+                    SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                } else {
+                    SystemBarStyle.light(
+                        android.graphics.Color.TRANSPARENT,
+                        android.graphics.Color.TRANSPARENT
+                    )
+                },
+                navigationBarStyle = if (isDark) {
+                    SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                } else {
+                    SystemBarStyle.light(
+                        android.graphics.Color.TRANSPARENT,
+                        android.graphics.Color.TRANSPARENT
+                    )
+                }
+            )
+
+            HerRhythmTheme(themeMode = themeMode) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
