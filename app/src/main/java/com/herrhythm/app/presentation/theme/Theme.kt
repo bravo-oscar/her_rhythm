@@ -14,9 +14,9 @@ private val LightColorScheme = lightColorScheme(
     secondaryContainer = LavenderLight,
     tertiary = Teal,
     tertiaryContainer = TealLight,
-    background = Color(0xFFFFF8F2),          // Warm cream
-    surface = Color(0xFFFFFBF8),             // Warm white
-    surfaceVariant = Color(0xFFFFF0EE),      // Pale pink
+    background = Color(0xFFFFFBF7),          // Warm bright cream
+    surface = Color(0xFFFFFFFF),             // Pure white for cards
+    surfaceVariant = Color(0xFFFFF5F3),      // Light pink tint
     onBackground = Color(0xFF3D3035),        // Soft dark
     onSurface = Color(0xFF3D3035),           // Soft dark
     onSurfaceVariant = Color(0xFF6D5060),    // Muted mauve
@@ -41,10 +41,15 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun HerRhythmTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    themeMode: String = "system",
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    val darkTheme = when (themeMode) {
+        "light" -> false
+        "dark" -> true
+        else -> isSystemInDarkTheme()
+    }
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(

@@ -59,6 +59,28 @@ fun SettingsScreen(
     ) {
         Text("Settings", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
 
+        // Appearance section
+        Card(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(16.dp)) {
+                Text("Appearance", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(8.dp))
+                Text("Theme", style = MaterialTheme.typography.bodyMedium)
+                Spacer(Modifier.height(4.dp))
+                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                    val options = listOf("light" to "Light", "dark" to "Dark", "system" to "System")
+                    options.forEachIndexed { index, (value, label) ->
+                        SegmentedButton(
+                            selected = settings.themeMode == value,
+                            onClick = { viewModel.updateSettings(settings.copy(themeMode = value)) },
+                            shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size)
+                        ) {
+                            Text(label)
+                        }
+                    }
+                }
+            }
+        }
+
         // Notifications section
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp)) {
