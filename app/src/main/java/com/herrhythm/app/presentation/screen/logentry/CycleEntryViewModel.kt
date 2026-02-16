@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.herrhythm.app.domain.model.Cycle
 import com.herrhythm.app.domain.model.FlowIntensity
 import com.herrhythm.app.domain.usecase.cycle.AddCycleUseCase
+import com.herrhythm.app.domain.usecase.cycle.DeleteCycleUseCase
 import com.herrhythm.app.domain.usecase.cycle.UpdateCycleUseCase
 import com.herrhythm.app.domain.repository.CycleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,13 +22,15 @@ data class CycleEntryUiState(
     val notes: String = "",
     val isEditing: Boolean = false,
     val editingCycleId: Long? = null,
-    val isSaved: Boolean = false
+    val isSaved: Boolean = false,
+    val isDeleted: Boolean = false
 )
 
 @HiltViewModel
 class CycleEntryViewModel @Inject constructor(
     private val addCycleUseCase: AddCycleUseCase,
     private val updateCycleUseCase: UpdateCycleUseCase,
+    private val deleteCycleUseCase: DeleteCycleUseCase,
     private val cycleRepository: CycleRepository
 ) : ViewModel() {
 
@@ -88,6 +91,16 @@ class CycleEntryViewModel @Inject constructor(
                 addCycleUseCase(cycle)
             }
             _uiState.update { it.copy(isSaved = true) }
+        }
+    }
+
+    fun delete() {
+        val cycleId = _uiState.value.editingCycleId ?: return
+        viewModelScope.launch {
+            cycleRepository.getCycleById(cycleId)?.let { cycle ->
+                deleteCycleUseCase(cycle)
+                _uiState.update { it.copy(isDeleted = true) }
+            }
         }
     }
 }

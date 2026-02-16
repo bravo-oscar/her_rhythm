@@ -60,6 +60,9 @@ fun HerRhythmNavHost() {
                     onAddEntry = { navController.navigate(Screen.DailyLogEntry.createRoute()) },
                     onEditEntry = { date ->
                         navController.navigate(Screen.DailyLogEntry.createRoute(date.toString()))
+                    },
+                    onEditCycle = { cycleId ->
+                        navController.navigate(Screen.CycleEntry.createRoute(cycleId))
                     }
                 )
             }
