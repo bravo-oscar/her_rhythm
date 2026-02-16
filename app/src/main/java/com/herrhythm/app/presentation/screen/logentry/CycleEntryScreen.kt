@@ -37,10 +37,8 @@ fun CycleEntryScreen(
         if (uiState.isSaved) onNavigateBack()
     }
 
-    var showStartDatePicker by remember { mutableStateOf(false) }
-    var showEndDatePicker by remember { mutableStateOf(false) }
-    var startPickerKey by remember { mutableIntStateOf(0) }
-    var endPickerKey by remember { mutableIntStateOf(0) }
+    var showDateRangePicker by remember { mutableStateOf(false) }
+    var dateRangePickerKey by remember { mutableIntStateOf(0) }
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -67,9 +65,9 @@ fun CycleEntryScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Start date
+                // Period dates
                 StyledCard(
-                    onClick = { startPickerKey++; showStartDatePicker = true },
+                    onClick = { dateRangePickerKey++; showDateRangePicker = true },
                     modifier = Modifier.fillMaxWidth(),
                     accentColor = Rose
                 ) {
@@ -84,28 +82,11 @@ fun CycleEntryScreen(
                             Text("Period Start Date", style = MaterialTheme.typography.labelLarge)
                             Spacer(Modifier.height(4.dp))
                             Text(uiState.startDate.toString(), style = MaterialTheme.typography.bodyLarge)
-                        }
-                    }
-                }
-
-                // End date (optional)
-                StyledCard(
-                    onClick = { endPickerKey++; showEndDatePicker = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    accentColor = Rose
-                ) {
-                    Row(Modifier.padding(16.dp)) {
-                        Icon(
-                            Icons.Default.CalendarToday,
-                            contentDescription = null,
-                            tint = Rose,
-                            modifier = Modifier.padding(end = 12.dp)
-                        )
-                        Column {
+                            Spacer(Modifier.height(12.dp))
                             Text("Period End Date (optional)", style = MaterialTheme.typography.labelLarge)
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                uiState.endDate?.toString() ?: "Tap to set",
+                                uiState.endDate?.toString() ?: "Not set",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = if (uiState.endDate == null) MaterialTheme.colorScheme.onSurfaceVariant
                                        else MaterialTheme.colorScheme.onSurface
@@ -148,50 +129,38 @@ fun CycleEntryScreen(
         }
     }
 
-    if (showStartDatePicker) {
-        key(startPickerKey) {
-            val datePickerState = rememberDatePickerState(
-                initialSelectedDateMillis = uiState.startDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+    if (showDateRangePicker) {
+        key(dateRangePickerKey) {
+            val dateRangePickerState = rememberDateRangePickerState(
+                initialSelectedStartDateMillis = uiState.startDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
+                initialSelectedEndDateMillis = uiState.endDate?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
             )
             DatePickerDialog(
-                onDismissRequest = { showStartDatePicker = false },
+                onDismissRequest = { showDateRangePicker = false },
                 confirmButton = {
                     TextButton(onClick = {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            val date = Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC).toLocalDate()
-                            viewModel.updateStartDate(date)
+                        dateRangePickerState.selectedStartDateMillis?.let { startMillis ->
+                            val startDate = Instant.ofEpochMilli(startMillis).atZone(ZoneOffset.UTC).toLocalDate()
+                            viewModel.updateStartDate(startDate)
                         }
-                        showStartDatePicker = false
+                        val endDate = dateRangePickerState.selectedEndDateMillis?.let { endMillis ->
+                            Instant.ofEpochMilli(endMillis).atZone(ZoneOffset.UTC).toLocalDate()
+                        }
+                        viewModel.updateEndDate(endDate)
+                        showDateRangePicker = false
                     }) { Text("OK") }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showStartDatePicker = false }) { Text("Cancel") }
+                    TextButton(onClick = { showDateRangePicker = false }) { Text("Cancel") }
                 }
-            ) { DatePicker(state = datePickerState) }
-        }
-    }
-
-    if (showEndDatePicker) {
-        key(endPickerKey) {
-            val datePickerState = rememberDatePickerState(
-                initialSelectedDateMillis = (uiState.endDate ?: uiState.startDate)
-                    .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
-            )
-            DatePickerDialog(
-                onDismissRequest = { showEndDatePicker = false },
-                confirmButton = {
-                    TextButton(onClick = {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            val date = Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC).toLocalDate()
-                            viewModel.updateEndDate(date)
-                        }
-                        showEndDatePicker = false
-                    }) { Text("OK") }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showEndDatePicker = false }) { Text("Cancel") }
-                }
-            ) { DatePicker(state = datePickerState) }
+            ) {
+                DateRangePicker(
+                    state = dateRangePickerState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(500.dp)
+                )
+            }
         }
     }
 }
