@@ -21,7 +21,7 @@ import com.herrhythm.app.presentation.common.components.StyledCard
 import com.herrhythm.app.presentation.theme.Rose
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +39,8 @@ fun CycleEntryScreen(
 
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
+    var startPickerKey by remember { mutableIntStateOf(0) }
+    var endPickerKey by remember { mutableIntStateOf(0) }
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -67,7 +69,7 @@ fun CycleEntryScreen(
             ) {
                 // Start date
                 StyledCard(
-                    onClick = { showStartDatePicker = true },
+                    onClick = { startPickerKey++; showStartDatePicker = true },
                     modifier = Modifier.fillMaxWidth(),
                     accentColor = Rose
                 ) {
@@ -88,7 +90,7 @@ fun CycleEntryScreen(
 
                 // End date (optional)
                 StyledCard(
-                    onClick = { showEndDatePicker = true },
+                    onClick = { endPickerKey++; showEndDatePicker = true },
                     modifier = Modifier.fillMaxWidth(),
                     accentColor = Rose
                 ) {
@@ -147,45 +149,49 @@ fun CycleEntryScreen(
     }
 
     if (showStartDatePicker) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = uiState.startDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        )
-        DatePickerDialog(
-            onDismissRequest = { showStartDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        val date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
-                        viewModel.updateStartDate(date)
-                    }
-                    showStartDatePicker = false
-                }) { Text("OK") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showStartDatePicker = false }) { Text("Cancel") }
-            }
-        ) { DatePicker(state = datePickerState) }
+        key(startPickerKey) {
+            val datePickerState = rememberDatePickerState(
+                initialSelectedDateMillis = uiState.startDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+            )
+            DatePickerDialog(
+                onDismissRequest = { showStartDatePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val date = Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC).toLocalDate()
+                            viewModel.updateStartDate(date)
+                        }
+                        showStartDatePicker = false
+                    }) { Text("OK") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showStartDatePicker = false }) { Text("Cancel") }
+                }
+            ) { DatePicker(state = datePickerState) }
+        }
     }
 
     if (showEndDatePicker) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = (uiState.endDate ?: uiState.startDate)
-                .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        )
-        DatePickerDialog(
-            onDismissRequest = { showEndDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        val date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
-                        viewModel.updateEndDate(date)
-                    }
-                    showEndDatePicker = false
-                }) { Text("OK") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showEndDatePicker = false }) { Text("Cancel") }
-            }
-        ) { DatePicker(state = datePickerState) }
+        key(endPickerKey) {
+            val datePickerState = rememberDatePickerState(
+                initialSelectedDateMillis = (uiState.endDate ?: uiState.startDate)
+                    .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+            )
+            DatePickerDialog(
+                onDismissRequest = { showEndDatePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val date = Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC).toLocalDate()
+                            viewModel.updateEndDate(date)
+                        }
+                        showEndDatePicker = false
+                    }) { Text("OK") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showEndDatePicker = false }) { Text("Cancel") }
+                }
+            ) { DatePicker(state = datePickerState) }
+        }
     }
 }
